@@ -1,8 +1,17 @@
 package ac.michel.poja.endpoint.rest.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.math.BigInteger;
 import java.util.Random;
 
 public class PrimeController {
+
+    @GetMapping("/new-prime")
+    public String generateNewPrime() {
+        BigInteger probablePrime = generateProbablePrime();
+        return "Probable Prime Number: " + probablePrime.toString();
+    }
 
     public static int generateRandomPrime() {
         Random random = new Random();
@@ -32,8 +41,9 @@ public class PrimeController {
         return true;
     }
 
-    public static void main(String[] args) {
-        int randomPrime = generateRandomPrime();
-        System.out.println("Random Prime Number: " + randomPrime);
+    private BigInteger generateProbablePrime() {
+        // Génère un nombre premier probable à 10 000 bits.
+        return BigInteger.probablePrime(10000, new Random());
     }
+    
 }
