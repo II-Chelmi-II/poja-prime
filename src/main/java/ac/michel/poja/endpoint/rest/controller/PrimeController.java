@@ -1,49 +1,48 @@
 package ac.michel.poja.endpoint.rest.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
+@RestController
+@RequestMapping("/api")
 public class PrimeController {
+
+    private static final int MAX_STORED_PRIMES = 10;
+    private static final List<BigInteger> generatedPrimes = new ArrayList<>();
 
     @GetMapping("/new-prime")
     public String generateNewPrime() {
         BigInteger probablePrime = generateProbablePrime();
+        storeGeneratedPrime(probablePrime);
         return "Probable Prime Number: " + probablePrime.toString();
     }
 
-    public static int generateRandomPrime() {
-        Random random = new Random();
-        int randomNum;
-
-        do {
-            // Génère un entier aléatoire entre 1 et Integer.MAX_VALUE inclus.
-            randomNum = random.nextInt(Integer.MAX_VALUE - 1) + 1;
-        } while (!isPrime(randomNum));
-
-        return randomNum;
+    @GetMapping("/generated-primes")
+    public List<String> getGeneratedPrimes() {
+        List<String> primeStrings = new ArrayList<>();
+        for (BigInteger prime : generatedPrimes) {
+            primeStrings.add(prime.toString());
+        }
+        return primeStrings;
     }
 
-    public static boolean isPrime(int num) {
-        // Vérifie que le nombre est strictement supérieur à 1.
-        if (num < 2) {
-            return false;
+    private void storeGeneratedPrime(BigInteger prime) {
+        if (generatedPrimes.size() >= MAX_STORED_PRIMES) {
+            // Si la liste atteint sa capacité maximale, retire le plus ancien élément.
+            generatedPrimes.remove(0);
         }
-
-        // Vérifie la primalité en utilisant une boucle jusqu'à la racine carrée.
-        for (int i = 2; i <= Math.sqrt(num); i++) {
-            if (num % i == 0) {
-                return false;
-            }
-        }
-
-        return true;
+        // Ajoute le nouveau nombre premier à la liste.
+        generatedPrimes.add(prime);
     }
 
     private BigInteger generateProbablePrime() {
         // Génère un nombre premier probable à 10 000 bits.
         return BigInteger.probablePrime(10000, new Random());
     }
-    
 }
